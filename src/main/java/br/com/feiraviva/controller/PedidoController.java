@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.feiraviva.security.ClienteAutenticado;
 
 import java.util.List;
 
@@ -34,9 +36,9 @@ public class PedidoController {
     @ApiResponse(responseCode = "409", description = "Carrinho vazio ou estoque insuficiente")
     public PedidoResponseDTO finalizar(
             @Parameter(description = "ID do cliente", required = true, example = "1")
-            @RequestParam Long clienteId,
+            @AuthenticationPrincipal ClienteAutenticado cliente,
             @Valid @RequestBody PedidoRequestDTO dto) {
-        return pedidoService.finalizar(clienteId, dto);
+        return pedidoService.finalizar(cliente.id(), dto);
     }
 
     @GetMapping
@@ -45,8 +47,8 @@ public class PedidoController {
     @ApiResponse(responseCode = "200", description = "Lista de pedidos")
     public List<PedidoResponseDTO> historico(
             @Parameter(description = "ID do cliente", required = true, example = "1")
-            @RequestParam Long clienteId) {
-        return pedidoService.historico(clienteId);
+            @AuthenticationPrincipal ClienteAutenticado cliente) {
+        return pedidoService.historico(cliente.id());
     }
 
     @GetMapping("/{id}")
@@ -56,10 +58,10 @@ public class PedidoController {
     @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     public PedidoResponseDTO buscar(
             @Parameter(description = "ID do cliente", required = true, example = "1")
-            @RequestParam Long clienteId,
+            @AuthenticationPrincipal ClienteAutenticado cliente,
             @Parameter(description = "ID do pedido", required = true, example = "1")
             @PathVariable Long id) {
-        return pedidoService.buscar(clienteId, id);
+        return pedidoService.buscar(cliente.id(), id);
     }
 
     @PostMapping("/{id}/cancelamento")
@@ -70,9 +72,9 @@ public class PedidoController {
     @ApiResponse(responseCode = "409", description = "Pedido não está com status CRIADO")
     public PedidoResponseDTO cancelar(
             @Parameter(description = "ID do cliente", required = true, example = "1")
-            @RequestParam Long clienteId,
+            @AuthenticationPrincipal ClienteAutenticado cliente,
             @Parameter(description = "ID do pedido", required = true, example = "1")
             @PathVariable Long id) {
-        return pedidoService.cancelar(clienteId, id);
+        return pedidoService.cancelar(cliente.id(), id);
     }
 }

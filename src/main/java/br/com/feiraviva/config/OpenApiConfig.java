@@ -7,6 +7,9 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import java.util.List;
 
@@ -15,6 +18,7 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI feiraVivaOpenAPI() {
+
         return new OpenAPI()
                 .info(new Info()
                         .title("Feira Viva API")
@@ -30,6 +34,12 @@ public class OpenApiConfig {
                         new Tag().name("Clientes").description("Cadastro e endereços"),
                         new Tag().name("Carrinho").description("Itens, cupom e estratégia de frete"),
                         new Tag().name("Pedidos").description("Finalização, histórico e cancelamento")
-                ));
+                ))
+                .components(new Components().addSecuritySchemes("bearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")))
+                .security(List.of(new SecurityRequirement().addList("bearerAuth")));
     }
 }

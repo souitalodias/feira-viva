@@ -1,6 +1,7 @@
 package br.com.feiraviva.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,5 +30,12 @@ public class ApiErrorHandler {
                 .map(f -> f.getField() + ": " + f.getDefaultMessage())
                 .collect(Collectors.joining(" | "));
         return Map.of("erro", "validacao", "mensagem", campos);
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> credenciaisInvalidas() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("erro", "credenciais_invalidas",
+                        "mensagem", "E-mail ou senha inválidos"));
     }
 }
