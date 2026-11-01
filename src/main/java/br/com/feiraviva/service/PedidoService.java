@@ -33,8 +33,11 @@ public class PedidoService {
         this.calculadoraFrete = calculadoraFrete;
     }
 
+
     @Transactional
     public PedidoResponseDTO finalizar(Long clienteId, PedidoRequestDTO dto) {
+        System.out.println(">>> CLIENTE ID VINDO DO TOKEN: " + clienteId);
+
         var carrinho = carrinhoRepository.findByClienteId(clienteId)
                 .filter(c -> !c.getItens().isEmpty())
                 .orElseThrow(() -> new RegraDeNegocioException(
@@ -66,15 +69,15 @@ public class PedidoService {
             subtotal = subtotal.add(itemPedido.getSubtotal());
         }
 
-//        var frete = carrinhoService.calcularFrete(subtotal);
-//        pedido.setSubtotal(subtotal);
-//        pedido.setFrete(frete);
-//        pedido.setTotal(subtotal.add(frete));
-
+        // Calcula o frete usando a estratégia definida no carrinho (removido a duplicidade)
         var estrategia = carrinho.getEstrategiaFrete() == null ? "PADRAO" :
                 carrinho.getEstrategiaFrete();
-
         var frete = calculadoraFrete.calcular(estrategia, subtotal);
+
+        // Atribui os valores ao pedido para evitar o erro de coluna nula (SUBTOTAL)
+        pedido.setSubtotal(subtotal);
+        pedido.setFrete(frete);
+        pedido.setTotal(subtotal.add(frete));
 
         pedidoRepository.save(pedido);
         pedido.setNumero(String.format("FV-%04d", pedido.getId()));  // dirty checking persiste

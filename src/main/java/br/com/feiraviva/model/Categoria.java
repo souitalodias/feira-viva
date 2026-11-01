@@ -1,9 +1,9 @@
 package br.com.feiraviva.model;
 
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "categorias")
@@ -72,6 +72,7 @@ public class Categoria {
         this.descricao = descricao;
     }
 
+    @JsonIgnore
     public Categoria getCategoriaPai() {
         return categoriaPai;
     }
